@@ -198,6 +198,12 @@ app.put('/veiculos/:id', async (req, res) => {
     if(!cliente_id) return mostrarVeiculos(req, res, 'cliente_id e obrigatorio.')
     
     await db.query('UPDATE veiculos SET cliente_id = ?, placa = ?, marca = ?, modelo = ?, ano = ? WHERE id = ?', [cliente_id, placa, marca, modelo, ano || devNull, req.params.id])
+
+    res.redirect('/veiculos')
+})
+
+app.delete('/veiculos/:id', async(req, res) => {
+    await excluir(res, 'veiculos', req.params.id, '/veiculos', 'O veiculo possui agendamentos')
 })
 
 
