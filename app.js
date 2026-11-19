@@ -207,6 +207,40 @@ app.delete('/veiculos/:id', async(req, res) => {
 })
 
 
+//===============================================PARTE AGENDAMENTOS===============================================
+app.get('/agendamentos', async (req, res) => {
+    const [lista] = await db.query('SELECT agendamento.*, veiculos.placa, veiculos.marca, veiculos.modelo, clientes. nome AS clientes_nome FROM agendamento JOIN veiculos ON veiculos.id = agendamento.veiculo_id JOIN clientes ON clientes.id = veiculos.cliente_id ORDER BY agendamento.data_agendamento') //Mudar "agendamento.data_agendamento" para como voce quer ordenar a lista
+
+    const [veiculos] = await db.query('SELECT * FROM veiculos')
+
+    const agendamentos = lista.map((a) => ({
+        ...a,
+        data_br: new Date(a.data_agendamento).toLocaleString('pt-BR'),
+        data_input: a.data_agendamento.slice(0,16).replace('', 'T')
+    }))
+
+    res.send(mostrar('agendamentos',(agendamentos, veiculos)))
+})
+
+app.post('/agendamentos', async (req, res) => {
+    const [veiculo_id, data_agendamento, servico] = req.body
+
+    await db.query('INSERT INTO agendamento (veiculo_id, data_agendamento, servico) VALUES (?,?,?,)', [veiculo_id, data_agendamento.replace('T', ''), servico])
+
+    res.redirect('/agendamentos')
+})
+
+app.put('/agendamentos/:id', async (req, res) => {
+    await db.query('UPDATE agendamento SET data_agendamento = ? WHERE id = ?', [req.body.data_agendamento.replace('T', ''), req.params.id])
+
+    res.redirect('/agendamentos')
+})
+
+app.delete('/agendamentos/:id', async (req, res) => {
+    await excluir(res, 'agendamento', req.params.id, '/agendamentos', '')
+})
+
+
 //===============================================FIM===============================================
 const porta = process.env.PORT || 3000;
 app.listen(porta, () => {
