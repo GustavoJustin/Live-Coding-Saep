@@ -192,13 +192,13 @@ app.post('/veiculos', async(req, res) => {
     res.redirect("/veiculos")
 })
 
-// 
-// 
-// 
-// Continuar na proxima aula (back de editar e excluir) 
-// 
-// 
-// 
+app.put('/veiculos/:id', async (req, res) => {
+    const {cliente_id, placa, marca, modelo, ano} = req.body
+
+    if(!cliente_id) return mostrarVeiculos(req, res, 'cliente_id e obrigatorio.')
+    
+    await db.query('UPDATE veiculos SET cliente_id = ?, placa = ?, marca = ?, modelo = ?, ano = ? WHERE id = ?', [cliente_id, placa, marca, modelo, ano || devNull, req.params.id])
+})
 
 
 //===============================================FIM===============================================
